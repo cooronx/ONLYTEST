@@ -21,25 +21,32 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.9.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
-<meta name="description" content="A man chooses,a slave obeys">
-<meta property="og:type" content="website">
-<meta property="og:title" content="cooronx">
-<meta property="og:url" content="http://example.com/index.html">
+<meta name="description" content="替罪羊树平衡树，平衡树，到底为什么叫平衡树呢？ 这个要从BST（二叉搜索树）说起了，我们知道二叉搜索树是一个不错的数据结构，可以快速的进行查询和删除数据的操作，但是一个普通的二叉搜索树若不经过一些特殊的操作，是远远达不到我们预期的效果的。首先举个例子！如下图：当输入部分数据为 1，4，7，8，13，21时，明明很美好的一个梦却退化为了一个链，这时查询的难度递增，例如我们来看：对于数据21，我们需要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一文彻底搞懂替罪羊树">
+<meta property="og:url" content="http://example.com/2022/01/03/page/index.html">
 <meta property="og:site_name" content="cooronx">
-<meta property="og:description" content="A man chooses,a slave obeys">
+<meta property="og:description" content="替罪羊树平衡树，平衡树，到底为什么叫平衡树呢？ 这个要从BST（二叉搜索树）说起了，我们知道二叉搜索树是一个不错的数据结构，可以快速的进行查询和删除数据的操作，但是一个普通的二叉搜索树若不经过一些特殊的操作，是远远达不到我们预期的效果的。首先举个例子！如下图：当输入部分数据为 1，4，7，8，13，21时，明明很美好的一个梦却退化为了一个链，这时查询的难度递增，例如我们来看：对于数据21，我们需要">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/4e296f93c7634f438d6c2063b687a921.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_14,color_FFFFFF,t_70,g_se,x_16#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d1f5dc3b457a484787e4f30adea1e713.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_13,color_FFFFFF,t_70,g_se,x_16#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/729300bdaec040ba8b48c6bd01106f67.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAZnNqX2Nvb3Jvbng=,size_14,color_FFFFFF,t_70,g_se,x_16#pic_center">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/1eb1d1b0905f4ed895a74b590c475fc3.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAZnNqX2Nvb3Jvbng=,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center">
+<meta property="article:published_time" content="2022-01-03T06:10:48.000Z">
+<meta property="article:modified_time" content="2022-01-03T06:15:38.278Z">
 <meta property="article:author" content="cooronx">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://img-blog.csdnimg.cn/4e296f93c7634f438d6c2063b687a921.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_14,color_FFFFFF,t_70,g_se,x_16#pic_center">
 
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/2022/01/03/page/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":true,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://example.com/2022/01/03/page/","path":"2022/01/03/page/","title":"一文彻底搞懂替罪羊树"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>cooronx</title>
+<title>一文彻底搞懂替罪羊树 | cooronx</title>
   
 
 
@@ -65,7 +72,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">cooronx</h1>
+      <p class="site-title">cooronx</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">cx blog</p>
@@ -94,7 +101,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -107,6 +114,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%BF%E7%BD%AA%E7%BE%8A%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">替罪羊树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">1. 插入操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C"><span class="nav-number">1.2.</span> <span class="nav-text">2.删除操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%A3%80%E6%9F%A5"><span class="nav-number">1.3.</span> <span class="nav-text">3.检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%B9%B3%E8%A1%A1"><span class="nav-number">1.4.</span> <span class="nav-text">4.平衡</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%85%B6%E4%BB%96%E7%BB%86%E6%9E%9D%E6%9C%AB%E8%8A%82"><span class="nav-number">1.5.</span> <span class="nav-text">5.其他细枝末节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-%E5%85%B3%E4%BA%8E%E9%82%A3%E4%B8%AA%E6%83%B0%E6%80%A7%E5%88%A0%E9%99%A4"><span class="nav-number">1.6.</span> <span class="nav-text">6.关于那个惰性删除</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8A%E4%BB%A3%E7%A0%81%EF%BC%81"><span class="nav-number">1.6.1.</span> <span class="nav-text">上代码！</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -153,16 +161,17 @@
 </noscript>
 
 
-    <div class="main-inner index posts-expand">
+    <div class="main-inner post posts-expand">
 
-    
+
+  
 
 
 <div class="post-block">
   
   
 
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/03/page/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -175,9 +184,9 @@
       <meta itemprop="name" content="cooronx">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/01/03/page/" class="post-title-link" itemprop="url">一文彻底搞懂替罪羊树</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          一文彻底搞懂替罪羊树
+        </h1>
 
         <div class="post-meta-container">
           <div class="post-meta">
@@ -225,7 +234,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h2 id="替罪羊树"><a href="#替罪羊树" class="headerlink" title="替罪羊树"></a>替罪羊树</h2><p>平衡树，平衡树，到底为什么叫平衡树呢？</p>
+        <h2 id="替罪羊树"><a href="#替罪羊树" class="headerlink" title="替罪羊树"></a>替罪羊树</h2><p>平衡树，平衡树，到底为什么叫平衡树呢？</p>
 <p>这个要从<strong>BST（二叉搜索树）</strong>说起了，我们知道二叉搜索树是一个不错的数据结构，可以快速的进行查询和删除数据的操作，但是一个普通的二叉搜索树若不经过一些<strong>特殊的操作</strong>，是远远达不到我们预期的效果的。<br>首先举个例子！如下图：当输入部分数据为 1，4，7，8，13，21时，明明很美好的一个梦却退化为了一个链，这时查询的难度递增，例如我们来看：<br>对于数据21，我们需要查询6次才能查询到，完全不符合我们的预期，那到底是哪里出问题了呢？</p>
 <p><img src="https://img-blog.csdnimg.cn/4e296f93c7634f438d6c2063b687a921.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_14,color_FFFFFF,t_70,g_se,x_16#pic_center" alt="在这里插入图片描述"><br>其实主要原因是因为<strong>树长丑了</strong>，对，这也就是平衡的基本意义（个人见解），<strong>左右子树是否对称</strong>，那向上文所说，我通过一个<strong>特殊的操作</strong>把这棵树变的好看，如下图，现在查询同样一个数据21，<strong>我们只需要查询4次</strong>（虽然也没快多少，但是就是这个意思），也就是把这棵树变得平衡了。</p>
 <p><img src="https://img-blog.csdnimg.cn/d1f5dc3b457a484787e4f30adea1e713.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_13,color_FFFFFF,t_70,g_se,x_16#pic_center" alt="在这里插入图片描述"><br>那要形成这样一颗平衡的树我们需要做些上面呢？<br>前提说明：</p>
@@ -248,7 +257,6 @@
 <h3 id="6-关于那个惰性删除"><a href="#6-关于那个惰性删除" class="headerlink" title="6.关于那个惰性删除"></a>6.关于那个惰性删除</h3><p>“ 个人理解，因为直接删除的话不方便处理父子结点的关系，而且会白白增加时间复杂度，不如打上一个标记，待会来处理。”</p>
 <h4 id="上代码！"><a href="#上代码！" class="headerlink" title="上代码！"></a>上代码！</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> R = <span class="number">0.75</span>;<span class="comment">//替罪羊树重构判断的系数</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">	<span class="keyword">int</span> l, r,val;<span class="comment">//左儿子，右儿子，该节点的值</span></span><br><span class="line">	<span class="keyword">int</span> size, fact;<span class="comment">//size : 以该点为父节点的子树的（虚拟）大小 fact : 以该点为父节点的子树的真实大小</span></span><br><span class="line">	<span class="keyword">bool</span> exist;<span class="comment">//该节点是否存在，在替罪羊树中我们用一个标记来表示该点是否被删除（也就是惰性删除的思维）</span></span><br><span class="line">&#125;a[<span class="number">100005</span>];</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> cnt,root;<span class="comment">//cnt 结点数量，root 根节点</span></span><br><span class="line"></span><br><span class="line">vector &lt;<span class="keyword">int</span>&gt; v;<span class="comment">//用来存放中序遍历出来的有序序列，用数组也行，只是写vector顺手</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">in</span><span class="params">(<span class="keyword">int</span> now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!now) &#123; <span class="keyword">return</span>; &#125;</span><br><span class="line">	<span class="built_in">in</span>(a[now].l);</span><br><span class="line">	<span class="keyword">if</span> (a[now].exist) &#123;</span><br><span class="line">		v.<span class="built_in">push_back</span>(now);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">in</span>(a[now].r);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//中序遍历 ：先遍历左子树，然后是根节点，最后是右子树 （需要注意的是我们要判断当前该点是否被删去）</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">lift</span><span class="params">(<span class="keyword">int</span> l, <span class="keyword">int</span> r, <span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (l == r) &#123;<span class="comment">//当该节点为叶结点</span></span><br><span class="line">		now = v[l];</span><br><span class="line">		a[now].size = a[now].fact = <span class="number">1</span>;</span><br><span class="line">		a[now].l = a[now].r = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">int</span> m = (l + r) &gt;&gt; <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (m&amp;&amp;l &lt; m &amp;&amp; a[v[m]].val == a[v[m - <span class="number">1</span>]].val)--m;<span class="comment">//这里要处理的是存在俩相同的情况如何处理</span></span><br><span class="line">	now = v[m];</span><br><span class="line">	<span class="keyword">if</span> (l &lt; m)<span class="built_in">lift</span>(l, m - <span class="number">1</span>, a[now].l);</span><br><span class="line">	<span class="keyword">else</span> a[now].l = <span class="number">0</span>;</span><br><span class="line">	<span class="built_in">lift</span>(m + <span class="number">1</span>, r, a[now].r);</span><br><span class="line">	a[now].size = a[a[now].l].size + a[a[now].r].size + <span class="number">1</span>;</span><br><span class="line">	a[now].fact = a[a[now].l].fact + a[a[now].r].fact + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//重构中的拎起来的那个操作</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">rebuild</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	v.<span class="built_in">clear</span>();</span><br><span class="line">	<span class="built_in">in</span>(now);</span><br><span class="line">	<span class="keyword">if</span> (v.<span class="built_in">empty</span>()) &#123;</span><br><span class="line">		now = <span class="number">0</span>;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">lift</span>(<span class="number">0</span>, v.<span class="built_in">size</span>() - <span class="number">1</span>, now);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">newnode</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	++cnt;</span><br><span class="line">	now = cnt;</span><br><span class="line">	a[now].val = val;</span><br><span class="line">	a[now].fact = a[now].size = <span class="number">1</span>;</span><br><span class="line">	a[now].exist = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">int</span> now, <span class="keyword">int</span> end)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!now)<span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span> (a[end].val &lt; a[now].val) &#123;</span><br><span class="line">		<span class="built_in">update</span>(a[now].l, end);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">update</span>(a[now].r, end);</span><br><span class="line">	a[now].size = a[a[now].l].size + a[a[now].r].size + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">imbalance</span><span class="params">(<span class="keyword">int</span> now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">max</span>(a[a[now].l].size, a[a[now].r].size) &gt; a[now].size * R || a[now].size - a[now].fact &gt; a[now].size * <span class="number">0.3</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;<span class="comment">//判断是否平衡，不平衡要及时调整</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(<span class="keyword">int</span>&amp; now,<span class="keyword">int</span> end)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (now == end)<span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">imbalance</span>(now)) &#123;</span><br><span class="line">		<span class="built_in">rebuild</span>(now);</span><br><span class="line">		<span class="built_in">update</span>(root,now);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (a[end].val &lt; a[now].val) &#123;</span><br><span class="line">		<span class="built_in">check</span>(a[now].l, end);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">check</span>(a[now].r, end);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">del</span><span class="params">(<span class="keyword">int</span> now,<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (a[now].exist &amp;&amp; a[now].val == val) &#123;</span><br><span class="line">		a[now].exist = <span class="literal">false</span>;</span><br><span class="line">		--a[now].fact;</span><br><span class="line">		<span class="built_in">check</span>(root,now);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	--a[now].fact;</span><br><span class="line">	<span class="keyword">if</span> (val &lt; a[now].val) &#123;</span><br><span class="line">		<span class="built_in">del</span>(a[now].l, val);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">del</span>(a[now].r, val);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!now) &#123;</span><br><span class="line">		<span class="built_in">newnode</span>(now, val);</span><br><span class="line">		<span class="built_in">check</span>(root,now);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	++a[now].size;</span><br><span class="line">	++a[now].fact;</span><br><span class="line">	<span class="keyword">if</span> (val &lt; a[now].val) &#123;</span><br><span class="line">		<span class="built_in">insert</span>(a[now].l, val);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">insert</span>(a[now].r, val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getrank</span><span class="params">(<span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> now = root, rank = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (now) &#123;</span><br><span class="line">		<span class="keyword">if</span> (a[now].val &gt;= val) &#123;</span><br><span class="line">			now = a[now].l;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			rank = rank + a[now].exist + a[a[now].l].fact;</span><br><span class="line">			now = a[now].r;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> rank;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getnum</span><span class="params">(<span class="keyword">int</span> rank)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> now = root;</span><br><span class="line">	<span class="keyword">while</span> (now) &#123;</span><br><span class="line">		<span class="keyword">if</span> (a[now].exist&amp;&amp;a[a[now].l].fact + a[now].exist == rank) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (a[a[now].l].fact &gt;= rank) &#123;</span><br><span class="line">			now = a[now].l;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			rank = rank - (a[a[now].l].fact + a[now].exist);</span><br><span class="line">			now = a[now].r;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> a[now].val;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> t;</span><br><span class="line">	cin &gt;&gt; t;</span><br><span class="line">	ios::<span class="built_in">sync_with_stdio</span>(<span class="literal">false</span>);</span><br><span class="line">	<span class="keyword">while</span> (t--) &#123;</span><br><span class="line">		<span class="keyword">int</span> op, x;</span><br><span class="line">		cin &gt;&gt; op &gt;&gt; x;</span><br><span class="line">		<span class="built_in"><span class="keyword">switch</span></span> (op)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">			<span class="built_in">insert</span>(root,x);</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">			<span class="built_in">del</span>(root, x);</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getrank</span>(x) &lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getnum</span>(x) &lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getnum</span>(<span class="built_in">getrank</span>(x) - <span class="number">1</span>) &lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getnum</span>(<span class="built_in">getrank</span>(x + <span class="number">1</span>)) &lt;&lt; endl;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-      
     </div>
 
     
@@ -256,112 +264,22 @@
     
 
     <footer class="post-footer">
-        <div class="post-eof"></div>
-      
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/01/03/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9C%8B%E5%8A%A0%E6%9D%83%E5%B9%B6%E6%9F%A5%E9%9B%86%20%E3%80%90POJ%201988%E3%80%91/" rel="prev" title="从一道题看加权并查集 【POJ 1988】">
+                  <i class="fa fa-chevron-left"></i> 从一道题看加权并查集 【POJ 1988】
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
     </footer>
   </article>
 </div>
 
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/03/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9C%8B%E5%8A%A0%E6%9D%83%E5%B9%B6%E6%9F%A5%E9%9B%86%20%E3%80%90POJ%201988%E3%80%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="cooronx">
-      <meta itemprop="description" content="A man chooses,a slave obeys">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="cooronx">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2022/01/03/%E4%BB%8E%E4%B8%80%E9%81%93%E9%A2%98%E7%9C%8B%E5%8A%A0%E6%9D%83%E5%B9%B6%E6%9F%A5%E9%9B%86%20%E3%80%90POJ%201988%E3%80%91/" class="post-title-link" itemprop="url">从一道题看加权并查集 【POJ 1988】</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-      
-
-      <time title="创建时间：2022-01-03 13:22:20 / 修改时间：14:06:09" itemprop="dateCreated datePublished" datetime="2022-01-03T13:22:20+08:00">2022-01-03</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/algorithm/" itemprop="url" rel="index"><span itemprop="name">algorithm</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.5k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="题意概述"><a href="#题意概述" class="headerlink" title="题意概述"></a>题意概述</h2><blockquote>
-<p>就是说在地面上存在一堆木块，你要<strong>执行p次操作</strong>，把<strong>x放到y</strong>上，然后询问你某一个木块的集合的数量</p>
-</blockquote>
-<p><strong>要注意的是当你移动一个木块（假设为A）到B上面去的时候，是把A整个集合移动到B上，这一点看样例就可以了解到</strong></p>
-<p>这很明显是一个典型的并查集的题目，当把A移动到B上面去的时候，相当于把b垫在了脚底下，这也就是我们在并查集中的父子关系，由上面<strong>易得A是B的</strong>父节点（father）。</p>
-<hr>
-<p><strong>但是难处理的是，如何找出任意结点下面有多少个结点</strong>，一个很自然的思路会想到我们先创建一个f_node数组用来记录该结点所在的树有多少个结点。但是光有结点仍然没有办法求出题目要求的数据，这时我们需要先再来讲一下什么叫路径压缩</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> x)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(x != f[x]) f[x] = <span class="built_in">find</span>(f[x]);<span class="comment">//一个标准的路径压缩模板</span></span><br><span class="line">    <span class="keyword">return</span> f[x];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>假设有这样一棵树<br><img src="https://img-blog.csdnimg.cn/ac3751f4613240adb2463c27317cffdb.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center"></p>
-<p><strong>当我们find开始寻找的时侯，find会一步一步地递归，直到结点编号=其父节点（根节点）的编号，然后再依次回溯回去给每一个树上的结点赋值为该根节点，</strong><br>也就是如下图所述，这样下次我们去查询的时候就会非常快</p>
-<p><img src="https://img-blog.csdnimg.cn/12f539eb42084f70ada9f98bc886df58.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBAcXFfNDI3MjIyNTU=,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center" alt="在这里插入图片描述"></p>
-<p>那通过这样一个流程可以发现我们可以很轻松的在路径压缩的过程中找出<strong>当前树中任意结点到该树根节点的距离</strong>也就是f_dis，通过这样的关系我们轻松可以得出关系 任意结点下的结点数 = f_node（该子树） - f_dis[该木块] -  1</p>
-<h2 id="上代码！"><a href="#上代码！" class="headerlink" title="上代码！"></a>上代码！</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="keyword">int</span> f[<span class="number">100005</span>];<span class="comment">//并查集的集合</span></span><br><span class="line"><span class="keyword">int</span> f_node[<span class="number">100005</span>];<span class="comment">//第i个树中有多少个结点</span></span><br><span class="line"><span class="keyword">int</span> f_dis[<span class="number">100005</span>];<span class="comment">//当前树中任意结点到该树根节点的距离</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (x != f[x]) &#123;</span><br><span class="line">		<span class="keyword">int</span> now = f[x];</span><br><span class="line">		f[x] = <span class="built_in">find</span>(f[x]);</span><br><span class="line">		f_dis[x] = f_dis[x] + f_dis[now];<span class="comment">//相当于从上到下依次相加距离</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> f[x];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">merge</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> fx = <span class="built_in">find</span>(x);</span><br><span class="line">	<span class="keyword">int</span> fy = <span class="built_in">find</span>(y);</span><br><span class="line">	<span class="keyword">if</span> (fx != fy) &#123;</span><br><span class="line">		f[fy] = fx;</span><br><span class="line">		f_dis[fy] = f_dis[fy] + f_node[fx];<span class="comment">//把fy接到fx下面去，就不难知道fy到根节点的值要加上fx这颗树的结点数</span></span><br><span class="line">		f_node[fx] = f_node[fx] + f_node[fy];<span class="comment">//加上俩树的总共结点数量</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">40000</span>; ++i) &#123;</span><br><span class="line">		f[i] = i;</span><br><span class="line">		f_node[i] = <span class="number">1</span>;</span><br><span class="line">		f_dis[i] = <span class="number">0</span>;<span class="comment">//注意初始化</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> t;</span><br><span class="line">	cin &gt;&gt; t;</span><br><span class="line">	<span class="built_in">init</span>();</span><br><span class="line">	<span class="keyword">while</span> (t--) &#123;</span><br><span class="line">		<span class="keyword">char</span> op;</span><br><span class="line">		cin &gt;&gt; op;</span><br><span class="line">		<span class="keyword">if</span> (op == <span class="string">&#x27;M&#x27;</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> x, y;</span><br><span class="line">			cin &gt;&gt; x &gt;&gt; y;</span><br><span class="line">			<span class="built_in">merge</span>(x, y);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (op == <span class="string">&#x27;C&#x27;</span>) &#123;</span><br><span class="line">			<span class="keyword">int</span> x;</span><br><span class="line">			cin &gt;&gt; x;</span><br><span class="line">			<span class="keyword">int</span> fx = <span class="built_in">find</span>(x);</span><br><span class="line">			cout &lt;&lt; f_node[fx] - f_dis[x] - <span class="number">1</span> &lt;&lt; endl;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
 
 
 
