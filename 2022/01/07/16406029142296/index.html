@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css" integrity="sha256-mUZM63G8m73Mcidfrv5E+Y61y7a12O5mW4ezU3bxqW4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"cooronx.github.io","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.9.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+<meta name="description" content="浅谈平衡树 avl 旋转，旋转，还是旋转 如何判断是否平衡 插入与删除">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一文彻底搞懂AVL树">
+<meta property="og:url" content="https://cooronx.github.io/2022/01/07/16406029142296/index.html">
+<meta property="og:site_name" content="cooronx">
+<meta property="og:description" content="浅谈平衡树 avl 旋转，旋转，还是旋转 如何判断是否平衡 插入与删除">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQud2lraW1lZGlhLm9yZy93aWtpcGVkaWEvY29tbW9ucy8zLzMxL1RyZWVfcm90YXRpb25fYW5pbWF0aW9uXzI1MHgyNTAuZ2lm">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5057293-45da57f7ccfefe4d.gif?imageMogr2/auto-orient/strip%257CimageView2/2/w/301">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/20190212235521446.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zNjg4ODU3Nw==,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2062943-398ba720e78d314a.png?imageMogr2/auto-orient/strip%257CimageView2/2/w/1200">
+<meta property="article:published_time" content="2022-01-07T09:36:00.000Z">
+<meta property="article:modified_time" content="2022-01-07T09:36:13.895Z">
+<meta property="article:author" content="cooronx">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQud2lraW1lZGlhLm9yZy93aWtpcGVkaWEvY29tbW9ucy8zLzMxL1RyZWVfcm90YXRpb25fYW5pbWF0aW9uXzI1MHgyNTAuZ2lm">
+
+
+<link rel="canonical" href="https://cooronx.github.io/2022/01/07/16406029142296/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://cooronx.github.io/2022/01/07/16406029142296/","path":"2022/01/07/16406029142296/","title":"一文彻底搞懂AVL树"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>一文彻底搞懂AVL树 | cooronx</title>
+  
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">cooronx</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">cx blog</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%85%E8%B0%88%E5%B9%B3%E8%A1%A1%E6%A0%91-avl"><span class="nav-number">1.</span> <span class="nav-text">浅谈平衡树 avl</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%8B%E8%BD%AC"><span class="nav-number">1.1.</span> <span class="nav-text">旋转</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#avl%E6%A0%91%E6%97%8B%E8%BD%AC%E7%9A%84%E5%9B%9B%E7%A7%8D%E6%83%85%E5%86%B5"><span class="nav-number">1.1.1.</span> <span class="nav-text">avl树旋转的四种情况</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E6%98%AF%E5%90%A6%E5%B9%B3%E8%A1%A1"><span class="nav-number">1.2.</span> <span class="nav-text">如何判断是否平衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%92%8C%E4%B8%80%E4%BA%9B%E9%9C%80%E8%A6%81%E6%B3%A8%E6%84%8F%E7%9A%84%E5%9C%B0%E6%96%B9"><span class="nav-number">1.3.</span> <span class="nav-text">代码和一些需要注意的地方</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A0%E9%99%A4%E4%B8%80%E4%B8%AA%E8%8A%82%E7%82%B9%E5%91%A2%EF%BC%9F"><span class="nav-number">1.3.1.</span> <span class="nav-text">如何删除一个节点呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8A%E4%BB%A3%E7%A0%81"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">上代码</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">cooronx</p>
+  <div class="site-description" itemprop="description">A man chooses,a slave obeys</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://cooronx.github.io/2022/01/07/16406029142296/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="cooronx">
+      <meta itemprop="description" content="A man chooses,a slave obeys">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="cooronx">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一文彻底搞懂AVL树
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2022-01-07 17:36:00 / 修改时间：17:36:13" itemprop="dateCreated datePublished" datetime="2022-01-07T17:36:00+08:00">2022-01-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%AE%97%E6%B3%95/" itemprop="url" rel="index"><span itemprop="name">算法</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+          ，
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%AE%97%E6%B3%95/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E5%B9%B3%E8%A1%A1%E6%A0%91/" itemprop="url" rel="index"><span itemprop="name">平衡树</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>5.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>5 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="浅谈平衡树-avl"><a href="#浅谈平衡树-avl" class="headerlink" title="浅谈平衡树 avl"></a>浅谈平衡树 avl</h1><ol>
+<li><strong>旋转</strong>，旋转，还是旋转</li>
+<li>如何判断是否平衡</li>
+<li>插入与删除<span id="more"></span></li>
+</ol>
+<hr>
+<h2 id="旋转"><a href="#旋转" class="headerlink" title="旋转"></a>旋转</h2><p>通过一种神奇的操作使树变得美观，分为左旋和右旋。先看看如何旋转，再来解释为什么这样旋转。</p>
+<blockquote>
+<p><strong>在avl和splay中的单旋其实是一样的，只不过在splay中改名叫做zig 和 zag了而已</strong>（冷知识，zig和zag在英文中就是转弯的意思）</p>
+</blockquote>
+<p>这里以左旋转举例子（右旋完全一致），先记住一个口诀，<strong>左旋拎右左挂右</strong>，再看接下里的gif更好地理解。（<del>为了防止有人不知道</del>，left rotate 左旋，right rotate 右旋）<br><img src="https://imgconvert.csdnimg.cn/aHR0cHM6Ly91cGxvYWQud2lraW1lZGlhLm9yZy93aWtpcGVkaWEvY29tbW9ucy8zLzMxL1RyZWVfcm90YXRpb25fYW5pbWF0aW9uXzI1MHgyNTAuZ2lm"></p>
+<p><strong>左旋 拎右</strong> —&gt; 指把被旋转的节点的左子树”<strong>提起来</strong>“，和替罪羊树的重构有点像的样子。</p>
+<p><strong>左 挂 右</strong> —&gt; <strong>指的是被旋转的节点的左子树的右子树成为被旋转节点的右子树</strong>（有点饶，建议多读几次）。</p>
+<p>这里的gif很生动地解释了当对A进行左旋转之后，B变成了A的父亲（根结点），<strong>而且此时树的性质也没有被改变</strong>，即依然满足BST。</p>
+<p><strong>但是</strong>，要注意的一点是，这里的A上面在旋转的时候还有其他节点（即A不是根结点），依然正常旋转，转完再连接起来就行了，<strong>这点真的把我折磨死了</strong>。<br><img src="https://upload-images.jianshu.io/upload_images/5057293-45da57f7ccfefe4d.gif?imageMogr2/auto-orient/strip%257CimageView2/2/w/301"></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">LeftRotate</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> r = a[now].r;</span><br><span class="line">	a[now].r = a[r].l;<span class="comment">//当前节点的右子树 = 当前节点右子树的左子树（挂！）</span></span><br><span class="line">	a[r].l = now;<span class="comment">//拎！</span></span><br><span class="line">	now = r;</span><br><span class="line">	<span class="built_in">update</span>(a[now].l), <span class="built_in">update</span>(now);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">RightRotate</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> l = a[now].l;</span><br><span class="line">	a[now].l = a[l].r;<span class="comment">//挂！</span></span><br><span class="line">	a[l].r = now;<span class="comment">//拎！</span></span><br><span class="line">	now = l;</span><br><span class="line">	<span class="built_in">update</span>(a[now].r),<span class="built_in">update</span>(now);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><del>是不是感觉很简单？</del>,但是这只是最基本的一个旋转，后面的旋转会有更多的复杂的地方。</p>
+<hr>
+<h3 id="avl树旋转的四种情况"><a href="#avl树旋转的四种情况" class="headerlink" title="avl树旋转的四种情况"></a>avl树旋转的四种情况</h3><p>我们都知道旋转是为了解决不平衡的情况，那不平衡都分为哪些情况呢？</p>
+<p>先下结论，<strong>四种，分别是LL,RR,LR,RL</strong>;</p>
+<p>LL <strong>左子树太高，而且左子树的左子树也还是比较高，那我们可以通过一次右旋达到平衡</strong><br><img src="https://img-blog.csdnimg.cn/20190212235521446.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl8zNjg4ODU3Nw==,size_16,color_FFFFFF,t_70"></p>
+<p><strong>RR 一样的道理和LL是对称的，就不放图展示了。</strong></p>
+<p><strong>LR 左子树太高了，而且左子树的右子树较高了</strong>，依然是图片展示<br><img src="https://upload-images.jianshu.io/upload_images/2062943-398ba720e78d314a.png?imageMogr2/auto-orient/strip%257CimageView2/2/w/1200"><br><strong>RL不过也是对称的而已</strong></p>
+<h2 id="如何判断是否平衡"><a href="#如何判断是否平衡" class="headerlink" title="如何判断是否平衡"></a>如何判断是否平衡</h2><p>我们对每个节点加入了一个<strong>高度值（height），表示的是该点下子树中高度最高的值</strong>，那么当一个点失衡的时候，<strong>也就是左子树高度减去右子树高度&gt;1或&lt;-1，即该点左子树过高了，需要调整</strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Factor</span><span class="params">(<span class="keyword">int</span> now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> R = a[a[now].l].height - a[a[now].r].height;</span><br><span class="line">	<span class="keyword">return</span> R;</span><br><span class="line">&#125;<span class="comment">//返回以该节点为父节点的树的高度</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> fa = <span class="built_in">Factor</span>(now);</span><br><span class="line">	<span class="keyword">if</span> (fa &gt; <span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> lfa = <span class="built_in">Factor</span>(a[now].l);</span><br><span class="line">		<span class="keyword">if</span> (lfa &gt; <span class="number">0</span>) <span class="built_in">RightRotate</span>(now);<span class="comment">//LL</span></span><br><span class="line">		<span class="keyword">else</span> <span class="built_in">LeftRotate</span>(a[now].l);<span class="built_in">RightRotate</span>(now);<span class="comment">//LR</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (fa &lt; <span class="number">-1</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> rfa = <span class="built_in">Factor</span>(a[now].r);</span><br><span class="line">		<span class="keyword">if</span> (rfa &lt; <span class="number">0</span>) <span class="built_in">LeftRotate</span>(now);<span class="comment">//RR</span></span><br><span class="line">		<span class="keyword">else</span> <span class="built_in">RightRotate</span>(a[now].r), <span class="built_in">LeftRotate</span>(now);<span class="comment">//RL</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (now) &#123;</span><br><span class="line">		<span class="built_in">update</span>(now);<span class="comment">//如果平衡，就不要旋转，更新一下新插入之后变化的信息</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>至此，四种avl树的旋转全部讲解完毕，这也就是整个avl树最重要的部分，剩下的就是一些细枝末节。</p>
+<h2 id="代码和一些需要注意的地方"><a href="#代码和一些需要注意的地方" class="headerlink" title="代码和一些需要注意的地方"></a>代码和一些需要注意的地方</h2><h3 id="如何删除一个节点呢？"><a href="#如何删除一个节点呢？" class="headerlink" title="如何删除一个节点呢？"></a>如何删除一个节点呢？</h3><p>首先要分情况：</p>
+<p>1.只有一个儿子（左儿子或右儿子）<br><strong>直接把他删去，连接上完成</strong></p>
+<p>2.两个儿子都健在<br>恼火，用<strong>它的后继来替换它自己本身。</strong></p>
+<p>也就是说找到<strong>要删除的节点的后继，用后继把这个节点的位置给占了就行了，这样删除后依然满足BST的性质（其实所有的BST都可以这样删除）</strong></p>
+<p>来看看代码就懂了！</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> fa)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> temp;</span><br><span class="line">	<span class="keyword">if</span> (!a[now].l) &#123;<span class="comment">//如果这个节点没有左儿子了，那肯定就是这个节点为后继了</span></span><br><span class="line">		temp = now;</span><br><span class="line">		a[fa].l = a[now].r;<span class="comment">//要注意的是，要把这个节点的右儿子（有可能没有）接在fa（也就是a[now]的右儿子上面，总不能不管这个节点吧）</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		temp = <span class="built_in">find</span>(a[now].l, now);<span class="comment">//一直找左边</span></span><br><span class="line">		<span class="built_in">check</span>(now);<span class="comment">//当我把后继从原本的位置拿走以后，子树有可能失去平衡，需要来检查一下</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> temp;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">del</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (a[now].val == val) &#123;</span><br><span class="line">		<span class="keyword">int</span> l = a[now].l, r = a[now].r;</span><br><span class="line">		<span class="keyword">if</span> (!l || !r) &#123;</span><br><span class="line">			now = l + r;<span class="comment">//只有一个儿子的情况，直接把上一个节点接在它的儿子或者右儿子上面</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			now = <span class="built_in">find</span>(r, r);<span class="comment">//找后继</span></span><br><span class="line">			<span class="keyword">if</span> (now != r) &#123;</span><br><span class="line">				a[now].r = r;<span class="comment">//后继不是它的右儿子（后继如果是它对右儿子对话，就只需把左边接上就可以了）。</span></span><br><span class="line">			&#125;</span><br><span class="line">			a[now].l = l;<span class="comment">//左边顺便接上</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (a[now].val &gt; val) <span class="built_in">del</span>(a[now].l, val);</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">del</span>(a[now].r, val);</span><br><span class="line">	<span class="built_in">check</span>(now);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其他的就没有什么需要特别注意的了，<del>剩下的都是基本的操作</del></p>
+<h4 id="上代码"><a href="#上代码" class="headerlink" title="上代码"></a>上代码</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">	<span class="keyword">int</span> l, r;</span><br><span class="line">	<span class="keyword">int</span> val;</span><br><span class="line">	<span class="keyword">int</span> height, size;</span><br><span class="line">&#125;a[<span class="number">100005</span>];</span><br><span class="line"><span class="keyword">int</span> cnt, root;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(<span class="keyword">int</span> now)</span> </span>&#123;</span><br><span class="line">	a[now].height = <span class="built_in">max</span>(a[a[now].l].height, a[a[now].r].height) + <span class="number">1</span>;</span><br><span class="line">	a[now].size = (a[a[now].l].size + a[a[now].r].size) + <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">newnode</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	++cnt;</span><br><span class="line">	now = cnt;</span><br><span class="line">	a[now].size = <span class="number">1</span>;</span><br><span class="line">	a[now].val = val;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">LeftRotate</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> r = a[now].r;</span><br><span class="line">	a[now].r = a[r].l;</span><br><span class="line">	a[r].l = now;</span><br><span class="line">	now = r;</span><br><span class="line">	<span class="built_in">update</span>(a[now].l), <span class="built_in">update</span>(now);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">RightRotate</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> l = a[now].l;</span><br><span class="line">	a[now].l = a[l].r;</span><br><span class="line">	a[l].r = now;</span><br><span class="line">	now = l;</span><br><span class="line">	<span class="built_in">update</span>(a[now].r),<span class="built_in">update</span>(now);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Factor</span><span class="params">(<span class="keyword">int</span> now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> R = a[a[now].l].height - a[a[now].r].height;</span><br><span class="line">	<span class="keyword">return</span> R;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">(<span class="keyword">int</span>&amp; now)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> fa = <span class="built_in">Factor</span>(now);</span><br><span class="line">	<span class="keyword">if</span> (fa &gt; <span class="number">1</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> lfa = <span class="built_in">Factor</span>(a[now].l);</span><br><span class="line">		<span class="keyword">if</span> (lfa &gt; <span class="number">0</span>) <span class="built_in">RightRotate</span>(now);</span><br><span class="line">		<span class="keyword">else</span> <span class="built_in">LeftRotate</span>(a[now].l); <span class="built_in">RightRotate</span>(now);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (fa &lt; <span class="number">-1</span>) &#123;</span><br><span class="line">		<span class="keyword">int</span> rfa = <span class="built_in">Factor</span>(a[now].r);</span><br><span class="line">		<span class="keyword">if</span> (rfa &lt; <span class="number">0</span>) <span class="built_in">LeftRotate</span>(now);</span><br><span class="line">		<span class="keyword">else</span> <span class="built_in">RightRotate</span>(a[now].r), <span class="built_in">LeftRotate</span>(now);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (now) &#123;</span><br><span class="line">		<span class="built_in">update</span>(now);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">insert</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!now) &#123;</span><br><span class="line">		<span class="built_in">newnode</span>(now, val);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (val &lt; a[now].val) <span class="built_in">insert</span>(a[now].l, val);</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">insert</span>(a[now].r, val);</span><br><span class="line">	<span class="built_in">check</span>(now);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">find</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> fa)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> temp;</span><br><span class="line">	<span class="keyword">if</span> (!a[now].l) &#123;</span><br><span class="line">		temp = now;</span><br><span class="line">		a[fa].l = a[now].r;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		temp = <span class="built_in">find</span>(a[now].l, now);</span><br><span class="line">		<span class="built_in">check</span>(now);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> temp;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">del</span><span class="params">(<span class="keyword">int</span>&amp; now, <span class="keyword">int</span> val)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (a[now].val == val) &#123;</span><br><span class="line">		<span class="keyword">int</span> l = a[now].l, r = a[now].r;</span><br><span class="line">		<span class="keyword">if</span> (!l || !r) &#123;</span><br><span class="line">			now = l + r;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			now = <span class="built_in">find</span>(r, r);</span><br><span class="line">			<span class="keyword">if</span> (now != r) &#123;</span><br><span class="line">				a[now].r = r;</span><br><span class="line">			&#125;</span><br><span class="line">			a[now].l = l;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (a[now].val &gt; val) <span class="built_in">del</span>(a[now].l, val);</span><br><span class="line">	<span class="keyword">else</span> <span class="built_in">del</span>(a[now].r, val);</span><br><span class="line">	<span class="built_in">check</span>(now);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getrank</span><span class="params">(<span class="keyword">int</span> num)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> now = root, rank = <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">while</span> (now) &#123;</span><br><span class="line">		<span class="keyword">if</span> (a[now].val &gt;= num) &#123;</span><br><span class="line">			now = a[now].l;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			rank = rank + a[a[now].l].size + <span class="number">1</span>;</span><br><span class="line">			now = a[now].r;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> rank;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getnum</span><span class="params">(<span class="keyword">int</span> rank)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> now = root;</span><br><span class="line">	<span class="keyword">while</span> (now) &#123;</span><br><span class="line">		<span class="keyword">if</span> (a[a[now].l].size + <span class="number">1</span> == rank) &#123; <span class="keyword">break</span>; &#125;</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (a[a[now].l].size &gt;= rank) &#123;</span><br><span class="line">			now = a[now].l;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			rank = rank - (a[a[now].l].size + <span class="number">1</span>);</span><br><span class="line">			now = a[now].r;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> a[now].val;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> t;</span><br><span class="line">	cin &gt;&gt; t;</span><br><span class="line">	<span class="keyword">while</span> (t--) &#123;</span><br><span class="line">		<span class="keyword">int</span> opt, x;</span><br><span class="line">		cin &gt;&gt; opt &gt;&gt; x;</span><br><span class="line">		<span class="built_in"><span class="keyword">switch</span></span> (opt)</span><br><span class="line">		&#123;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">			<span class="built_in">insert</span>(root, x);</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">			<span class="built_in">del</span>(root, x);</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getrank</span>(x) &lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">4</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getnum</span>(x) &lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">5</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getnum</span>(<span class="built_in">getrank</span>(x)<span class="number">-1</span> )&lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">case</span> <span class="number">6</span>:</span><br><span class="line">			cout &lt;&lt; <span class="built_in">getnum</span>(<span class="built_in">getrank</span>(x + <span class="number">1</span>)) &lt;&lt; endl;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/01/03/page/" rel="prev" title="一文彻底搞懂替罪羊树">
+                  <i class="fa fa-chevron-left"></i> 一文彻底搞懂替罪羊树
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">cooronx</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">14k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">12 分钟</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
